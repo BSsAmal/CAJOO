@@ -24,16 +24,29 @@ export const schema = new GraphQLSchema({
         args: {
           patientsSortDirection: {
             type: GraphQLString
+          },
+          countrySortDirection : {
+            type: GraphQLString
+          },
+          search :{
+            type : GraphQLString
           }
         },
-        resolve: (_, { patientsSortDirection }) => {
+        resolve: (_, { patientsSortDirection, countrySortDirection, search }) => {
           let baseQuery = queryBuilder("clinical_trial");
+          if(search == ""){
           if (patientsSortDirection !== null) {
             baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
           }
+         if (countrySortDirection !== null) {
+            baseQuery = baseQuery.orderBy("country", countrySortDirection);
+          }
           return baseQuery.select();
         }
-      }
+        else {
+          return baseQuery.select().where({country : search })
+        }
+            }      }
     }
   })
 });

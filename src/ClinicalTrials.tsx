@@ -3,6 +3,7 @@ import React, { Fragment, useCallback } from "react";
 
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 import { PatientsSortDirection } from "./App";
+import {CountrySortDirection } from "./App";
 
 const Table = styled.div`
   border-collapse: separate;
@@ -59,35 +60,88 @@ const Cell = styled.div`
 interface Props {
   clinicalTrials: AppQueryResponse["clinicalTrials"];
   patientsSortDirection: PatientsSortDirection;
+  countrySortDirection : CountrySortDirection ;
+  search : string;
   setPatientsSortDirection: (
     patientsSortDirection: PatientsSortDirection
+
+  
+  ) => void;
+
+  setCountrySortDirection: (
+    countrySortDirection: CountrySortDirection
+
+  
+  ) => void;
+
+  setSearch: (
+    search: string
+
   ) => void;
 }
 
 const ClinicalTrials: React.FC<Props> = ({
   clinicalTrials,
   patientsSortDirection,
-  setPatientsSortDirection
+  setPatientsSortDirection,
+  countrySortDirection,
+  setCountrySortDirection,
+  search,
+  setSearch
+
 }: Props) => {
   const togglePatientsSortDirection = useCallback(() => {
-    if (patientsSortDirection == null) {
+    if (patientsSortDirection == null ) {
+      //to not link the patient with the county in the up and down direction when clicking on the flech so we put null for setCoutrydirection in the asc & desc 
       setPatientsSortDirection("asc");
+      setCountrySortDirection(null);
     } else if (patientsSortDirection === "asc") {
+
       setPatientsSortDirection("desc");
+      setCountrySortDirection(null);
+
     } else {
       setPatientsSortDirection(null);
     }
   }, [patientsSortDirection, setPatientsSortDirection]);
 
+// Sorting by country 
+  const toggleCountrySortDirection = useCallback(() => {
+ //to not link the patient with the county in the up and down direction when clicking on the flech so we put null for setCoutryPatient in the asc & desc 
+
+    if (countrySortDirection == null ) {
+
+      setCountrySortDirection("asc");
+      setPatientsSortDirection(null);
+
+    } else if (countrySortDirection === "asc" ) {
+      setCountrySortDirection("desc");
+      setPatientsSortDirection(null);
+
+    } else {
+      setCountrySortDirection(null);
+    }
+  }, [countrySortDirection, setCountrySortDirection]);
+
+
+
+  
   return (
     <Fragment>
+
       <h1>Clinical trials</h1>
+      <input type ="text" value ={search} placeholder="Search Country" className = "prompt" onChange={(event)=>
+              setSearch(event.target.value)
+            }/>
+     {console.log(search )}
       <Table>
         <Header>
           <HeaderCell>site</HeaderCell>
-          <HeaderCell>country</HeaderCell>
+          <ClickableHeaderCell onClick ={toggleCountrySortDirection}>country{sortDirectionIndicatorCountry(countrySortDirection)}</ClickableHeaderCell>
+          <HeaderCell>city</HeaderCell>
+
           <ClickableHeaderCell onClick={togglePatientsSortDirection}>
-            patients{sortDirectionIndicator(patientsSortDirection)}
+            patients{sortDirectionIndicatorPatient(patientsSortDirection)}
           </ClickableHeaderCell>
         </Header>
         <Body>
@@ -95,6 +149,7 @@ const ClinicalTrials: React.FC<Props> = ({
             <Row key={clinicalTrial.site}>
               <Cell>{clinicalTrial.site}</Cell>
               <Cell>{clinicalTrial.country}</Cell>
+              <Cell>{clinicalTrial.city.charAt(0).toUpperCase() + clinicalTrial.city.slice(1)}</Cell>
               <Cell>{clinicalTrial.patients}</Cell>
             </Row>
           ))}
@@ -104,12 +159,21 @@ const ClinicalTrials: React.FC<Props> = ({
   );
 };
 
-const sortDirectionIndicator = (
-  patientsSortDirection: PatientsSortDirection
+const sortDirectionIndicatorPatient = (
+  patientsSortDirection: PatientsSortDirection,
 ) => {
-  if (patientsSortDirection === "asc") return "↑";
+  if (patientsSortDirection === "asc" ) return "↑";
   if (patientsSortDirection === "desc") return "↓";
   return "";
 };
 
+
+const sortDirectionIndicatorCountry = (
+  
+  countrySortDirection :CountrySortDirection
+) => {
+  if (countrySortDirection ==="asc" ) return "↑";
+  if (countrySortDirection ==="desc" ) return "↓";
+  return "";
+};
 export default ClinicalTrials;
