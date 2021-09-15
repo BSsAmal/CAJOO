@@ -130,10 +130,9 @@ const ClinicalTrials: React.FC<Props> = ({
     <Fragment>
 
       <h1>Clinical trials</h1>
-      <input type ="text" value ={search} placeholder="Search Country" className = "prompt" onChange={(event)=>
+      <input  type ="text" autoFocus={true} value ={search} placeholder="Search Country"  onChange={(event)=>
               setSearch(event.target.value)
             }/>
-     {console.log(search )}
       <Table>
         <Header>
           <HeaderCell>site</HeaderCell>

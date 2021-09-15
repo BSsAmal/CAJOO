@@ -3,7 +3,7 @@ import {
   GraphQLSchema,
   GraphQLNonNull,
   GraphQLList,
-  GraphQLString
+  GraphQLString,
 } from "graphql";
 import { nodeDefinitions } from "graphql-relay";
 
@@ -23,30 +23,33 @@ export const schema = new GraphQLSchema({
         type: GraphQLNonNull(GraphQLList(GraphQLNonNull(ClinicalTrialType))),
         args: {
           patientsSortDirection: {
-            type: GraphQLString
+            type: GraphQLString,
           },
-          countrySortDirection : {
-            type: GraphQLString
+          countrySortDirection: {
+            type: GraphQLString,
           },
-          search :{
-            type : GraphQLString
+          search: {
+            type: GraphQLString,
+          },
+        },
+        resolve: (
+          _,
+          { patientsSortDirection, countrySortDirection, search }
+        ) => {
+          let baseQuery = queryBuilder("clinical_trial");
+          if (search == "") {
+            if (patientsSortDirection !== null) {
+              baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
+            }
+            if (countrySortDirection !== null) {
+              baseQuery = baseQuery.orderBy("country", countrySortDirection);
+            }
+            return baseQuery.select();
+          } else {
+            return baseQuery.select().where({ country: search });
           }
         },
-        resolve: (_, { patientsSortDirection, countrySortDirection, search }) => {
-          let baseQuery = queryBuilder("clinical_trial");
-          if(search == ""){
-          if (patientsSortDirection !== null) {
-            baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
-          }
-         if (countrySortDirection !== null) {
-            baseQuery = baseQuery.orderBy("country", countrySortDirection);
-          }
-          return baseQuery.select();
-        }
-        else {
-          return baseQuery.select().where({country : search })
-        }
-            }      }
-    }
-  })
+      },
+    },
+  }),
 });
